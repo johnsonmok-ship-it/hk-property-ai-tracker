@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 
 print("Loading updated datasets (up to July 2026)...")
 # Load datasets
@@ -85,63 +84,7 @@ for i, v in enumerate(yearly_psf.values):
 plt.grid(True, linestyle='--', alpha=0.3)
 plt.tight_layout()
 
-# --- SAVE DIRECTLY TO CURRENT DIRECTORY ---
+# --- FOOLPROOF FIX: SAVE DIRECTLY TO ROOT FOLDER ---
+# No more 'public/' folder. It saves right next to the script!
 plt.savefig('feature_trends.png', bbox_inches='tight')
 print("Successfully saved chart to feature_trends.png")
-```eof
-**Crucial:** Make sure you click the green **"Commit changes"** button after editing.
-
-### 2. Replace the entire content of `.github/workflows/update_model.yml`
-
-Go back to your `<> Code` tab, navigate to `.github/workflows/update_model.yml`, edit it, and **replace everything** with the following code. This version runs the script and then explicitly handles moving the file into the `public` folder.
-
-```yaml:update_model.yml
-name: Automated AI Property Valuation Updater
-
-# 1. THE SCHEDULE (Wake up on the 1st of every month at midnight)
-on:
-  schedule:
-    - cron: '0 0 1 * *'
-  workflow_dispatch: # Allows you to click a "Run Now" button manually
-
-# 2. THE AGENT (The virtual machine)
-jobs:
-  update-data:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Gives the agent permission to save files back to GitHub
-
-    steps:
-      # A. Get your code
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-
-      # B. Install Python and your libraries
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-          
-      - name: Install Dependencies
-        run: |
-          pip install pandas numpy scikit-learn matplotlib
-
-      # C. Run your Machine Learning Script and Move the File
-      - name: Run Random Forest Model
-        run: |
-          python estate_micro_trends.py
-          mkdir -p public
-          mv feature_trends.png public/feature_trends.png
-
-      # D. Push the new charts back to the website!
-      - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "🤖 AI Agent: Updated Property Feature Trends"
-          file_pattern: 'public/*.png public/*.json'
-```eof
-**Crucial:** Click **"Commit changes"** for this file as well.
-
-### 3. Run the Workflow Again
-
-Once *both* files have been completely replaced and committed, go to the **Actions** tab and trigger the workflow manually one more time. It should now successfully execute, move the file, and commit the update.
