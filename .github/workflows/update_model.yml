@@ -1,19 +1,4 @@
 name: Automated AI Property Valuation Updater
-
-# 1. THE SCHEDULE (Wake up on the 1st of every month at midnight)
-on:
-  schedule:
-    - cron: '0 0 1 * *'
-  workflow_dispatch: # Allows you to click a "Run Now" button manually
-
-# 2. THE AGENT (The virtual machine)
-jobs:
-  update-data:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Gives the agent permission to save files back to GitHub
-
-    steps:
 # A. Get your code
     - name: Checkout Repository
       uses: actions/checkout@v5
