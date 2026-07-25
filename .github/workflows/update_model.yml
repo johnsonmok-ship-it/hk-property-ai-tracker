@@ -31,10 +31,11 @@ jobs:
       # C. Run your Machine Learning Script
       - name: Run Random Forest Model
         run: python estate_micro_trends.py
-
+             mv feature_trends.png public/feature_trends.png
+             
       # D. Push the new charts back to the website!
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "🤖 AI Agent: Updated Property Feature Trends"
-          file_pattern: 'public/*.png public/*.json'
+          file_pattern: 'public/*.png'
