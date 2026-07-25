@@ -88,3 +88,55 @@ plt.tight_layout()
 # No more 'public/' folder. It saves right next to the script!
 plt.savefig('feature_trends.png', bbox_inches='tight')
 print("Successfully saved chart to feature_trends.png")
+```eof
+
+### 2. Update `.github/workflows/update_model.yml`
+
+This workflow file no longer attempts to create or move files into a `public/` directory.
+
+```yaml:.github/workflows/update_model.yml
+name: Automated AI Property Valuation Updater
+
+# 1. THE SCHEDULE (Wake up on the 1st of every month at midnight)
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # Allows you to click a "Run Now" button manually
+
+# 2. THE AGENT (The virtual machine)
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Gives the agent permission to save files back to GitHub
+
+    steps:
+      # A. Get your code
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      # B. Install Python and your libraries
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy scikit-learn matplotlib
+
+      # C. Run your Machine Learning Script (No folder creation needed)
+      - name: Run Random Forest Model
+        run: python estate_micro_trends.py
+
+      # D. Push the new chart back to the website!
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 AI Agent: Updated Property Feature Trends"
+          file_pattern: '*.png'
+```eof
+
+### 3. Update `index.html`
+
+Finally, we update the HTML file so it looks for `feature_trends.png` in the main folder instead of `public/feature_trends.png`.
