@@ -1,26 +1,43 @@
 name: Automated AI Property Valuation Updater
-# A. Get your code
-    - name: Checkout Repository
-      uses: actions/checkout@v5
 
-  # B. Install Python and your libraries
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-      python-version: '3.10'
-      
-    - name: Install Dependencies
-    run: |
-      pip install pandas numpy scikit-learn matplotlib
+# 1. THE SCHEDULE (Wake up on the 1st of every month at midnight)
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # Allows you to click a "Run Now" button manually
 
-  # C. Run your Machine Learning Script (No folder creation needed)
+# 2. THE AGENT (The virtual machine)
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Gives the agent permission to save files back to GitHub
+
+    steps:
+      # A. Get your code
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      # B. Install Python and your libraries
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy scikit-learn matplotlib
+
+      # C. Run your Machine Learning Script
       - name: Run Random Forest Model
-      run: python estate_micro_trends.py
+        run: |
+          python estate_micro_trends.py
+          mkdir -p public
+          mv feature_trends.png public/feature_trends.png
 
-  # D. Push the new chart back to the website!
+      # D. Push the new charts back to the website!
       - name: Commit and Push Changes
-    uses: stefanzweifel/git-auto-commit-action@v5
-    with:
-      commit_message: "🤖 AI Agent: Updated Property Feature Trends"
-      file_pattern: '*.png'
-
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 AI Agent: Updated Property Feature Trends"
+          file_pattern: 'public/*.png public/*.json'
