@@ -29,8 +29,6 @@ jobs:
           pip install pandas numpy scikit-learn matplotlib
 
       # C. Run your Machine Learning Script
-      - name: Create public folder
-        run: mkdir -p public
       - name: Run Random Forest Model
         run: python estate_micro_trends.py
 
