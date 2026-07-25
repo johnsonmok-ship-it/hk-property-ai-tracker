@@ -14,31 +14,28 @@ jobs:
       contents: write # Gives the agent permission to save files back to GitHub
 
     steps:
-      # A. Get your code
-      - name: Checkout Repository
-        uses: actions/checkout@v5
+# A. Get your code
+    - name: Checkout Repository
+      uses: actions/checkout@v5
 
-      # B. Install Python and your libraries
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-          
-      - name: Install Dependencies
-        run: |
-          pip install pandas numpy scikit-learn matplotlib
+  # B. Install Python and your libraries
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+      python-version: '3.10'
+      
+    - name: Install Dependencies
+    run: |
+      pip install pandas numpy scikit-learn matplotlib
 
-      # C. Run your Machine Learning Script
-      - name: Create public folder
-        run: mkdir -p public
-        
+  # C. Run your Machine Learning Script (No folder creation needed)
       - name: Run Random Forest Model
-        run: python estate_micro_trends.py
-          #   mv feature_trends.png public/feature_trends.png
-             
-      # D. Push the new charts back to the website!
+      run: python estate_micro_trends.py
+
+  # D. Push the new chart back to the website!
       - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "🤖 AI Agent: Updated Property Feature Trends"
-          file_pattern: 'public/*.png'
+    uses: stefanzweifel/git-auto-commit-action@v5
+    with:
+      commit_message: "🤖 AI Agent: Updated Property Feature Trends"
+      file_pattern: '*.png'
+
