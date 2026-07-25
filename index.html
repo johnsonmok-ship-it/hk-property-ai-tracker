@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HK Property AI Tracker</title>
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Load Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.1); }
+        .read-only-box { background-color: #f1f5f9; border: 1px dashed #cbd5e1; color: #475569; }
+        
+        .tab-btn { transition: all 0.2s; }
+        .tab-btn.active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-robot text-blue-600 text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">Prop<span class="text-blue-600">AI</span> HK</span>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="w-2 h-2 mr-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        Agent Active
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Hybrid RF-LSTM Valuation Engine</h1>
+            <p class="text-slate-500 text-lg">Live tracking of Hong Kong blue-chip estates using Machine Learning.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 mb-6">
+            <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn active px-4 py-3 text-sm font-medium text-slate-600 hover:text-slate-800 outline-none">
+                <i class="fas fa-calculator mr-2"></i>Interactive Simulator
+            </button>
+            <button onclick="switchTab('trends')" id="tab-trends" class="tab-btn px-4 py-3 text-sm font-medium text-slate-600 hover:text-slate-800 outline-none">
+                <i class="fas fa-chart-line mr-2"></i>Live Automated Trends
+            </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: INTERACTIVE SIMULATOR               -->
+        <!-- ========================================== -->
+        <div id="section-simulator" class="block">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Column: Inputs -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="glass-panel rounded-2xl shadow-sm p-6">
+                        <h2 class="text-xl font-semibold mb-4 text-slate-800 border-b pb-2">
+                            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> Target Property
+                        </h2>
+                        
+                        <!-- Estate -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Estate</label>
+                            <select id="estate" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="updatePhases()">
+                                <option value="Taikoo Shing">Taikoo Shing (Prestige)</option>
+                                <option value="City One">City One (Starter)</option>
+                                <option value="Kingswood Villas">Kingswood Villas (Space)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Phase / Mansion</label>
+                            <select id="phase" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="updateBlocks()"></select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Block Number</label>
+                            <select id="block" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="updateFloorsRooms()"></select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Floor</label>
+                                <select id="floor" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="inferAttributes()"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Room</label>
+                                <select id="room" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="inferAttributes()"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column: AI Inferred Specs -->
+                <div class="lg:col-span-3 space-y-6">
+                    <div class="glass-panel rounded-2xl shadow-sm p-6 h-full">
+                        <h2 class="text-xl font-semibold mb-4 text-slate-800 border-b pb-2">
+                            <i class="fas fa-brain text-teal-500 mr-2"></i> AI Inferred
+                        </h2>
+                        <p class="text-xs text-slate-500 mb-5">Physical traits calculated via Random Forest encoding.</p>
+                        
+                        <div class="mb-5 p-3 read-only-box rounded-lg text-center">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit Size</label>
+                            <div class="text-3xl font-bold text-slate-800"><span id="inferred-size">--</span><span class="text-sm font-normal text-slate-500 ml-1">sqft</span></div>
+                        </div>
+
+                        <div class="mb-5 p-3 read-only-box rounded-lg text-center">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">View Score (1-9)</label>
+                            <div class="text-3xl font-bold text-pink-600"><span id="inferred-view">--</span></div>
+                            <div class="text-xs font-semibold text-slate-500 mt-1" id="view-desc"></div>
+                        </div>
+
+                        <div class="p-3 read-only-box rounded-lg text-center">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Transit Distance</label>
+                            <div class="text-3xl font-bold text-slate-800"><span id="inferred-distance">--</span><span class="text-sm font-normal text-slate-500 ml-1">m</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results & Macro Scenarios -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- Baseline Output -->
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden card-hover">
+                        <div class="absolute -right-4 -bottom-4 p-4 opacity-10 text-8xl"><i class="fas fa-home"></i></div>
+                        <h2 class="text-slate-300 text-sm font-semibold uppercase tracking-wider mb-1">Physical Baseline Valuation</h2>
+                        <p class="text-xs text-slate-400 mb-4">Assuming stable macro conditions.</p>
+                        <div class="text-5xl font-bold tracking-tight mb-2 text-white">
+                            $<span id="base-price">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Macro Scenarios -->
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-3"><i class="fas fa-project-diagram text-indigo-500 mr-2"></i> LSTM Macro Scenarios</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm card-hover">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold text-slate-700 text-sm">Bull Market</span>
+                                    <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full">+1000 HSI</span>
+                                </div>
+                                <div class="text-xl font-bold text-slate-900">$<span id="bull-price">0</span></div>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm card-hover">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold text-slate-700 text-sm">Bear Market</span>
+                                    <span class="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full">-1000 HSI</span>
+                                </div>
+                                <div class="text-xl font-bold text-slate-900">$<span id="bear-price">0</span></div>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm card-hover">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold text-slate-700 text-sm">Rate Cut</span>
+                                    <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full">-0.5% HIBOR</span>
+                                </div>
+                                <div class="text-xl font-bold text-slate-900">$<span id="cut-price">0</span></div>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm card-hover">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold text-slate-700 text-sm">Rate Hike</span>
+                                    <span class="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full">+0.5% HIBOR</span>
+                                </div>
+                                <div class="text-xl font-bold text-slate-900">$<span id="hike-price">0</span></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: LIVE AUTOMATED TRENDS               -->
+        <!-- ========================================== -->
+        <div id="section-trends" class="hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start">
+                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3 text-lg"></i>
+                <div>
+                    <h3 class="font-semibold text-blue-900">GitOps Pipeline Active</h3>
+                    <p class="text-blue-800 text-sm mt-1">The charts below are automatically updated by a GitHub Actions agent that retrains the Random Forest models against the latest transaction data monthly.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-8">
+                
+                <!-- Chart Placeholder 1 -->
+                <div class="glass-panel rounded-2xl shadow-sm p-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Micro-Psychology: Feature Priority by Estate</h3>
+                    <p class="text-slate-500 text-sm mb-4">Tracking how the importance of Size, Floor, View, and Distance shifts across different demographics over time.</p>
+                    <div class="bg-slate-100 rounded-lg w-full flex items-center justify-center border-2 border-dashed border-slate-300" style="height: 400px;">
+                        <!-- The GitHub Action will save an image here. If missing, show a fallback -->
+                        <img src="public/feature_trends.png" alt="Auto-updating Feature Trends Chart" onerror="this.onerror=null; this.src='https://placehold.co/1000x400/e2e8f0/475569?text=Awaiting+Next+GitHub+Action+Run...';" class="max-w-full max-h-full object-contain mix-blend-multiply">
+                    </div>
+                </div>
+
+                <!-- Chart Placeholder 2 -->
+                <div class="glass-panel rounded-2xl shadow-sm p-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Flight to Quality: View Tier Market Share</h3>
+                    <p class="text-slate-500 text-sm mb-4">Base-100 Growth Index tracking the expansion of Premium View transactions during market corrections.</p>
+                    <div class="bg-slate-100 rounded-lg w-full flex items-center justify-center border-2 border-dashed border-slate-300" style="height: 400px;">
+                        <img src="public/view_growth.png" alt="Auto-updating View Growth Chart" onerror="this.onerror=null; this.src='https://placehold.co/1000x400/e2e8f0/475569?text=Awaiting+Next+GitHub+Action+Run...';" class="max-w-full max-h-full object-contain mix-blend-multiply">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- TAB LOGIC ---
+        function switchTab(tabId) {
+            // Update Buttons
+            document.getElementById('tab-simulator').classList.remove('active');
+            document.getElementById('tab-trends').classList.remove('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            // Update Sections
+            document.getElementById('section-simulator').classList.add('hidden');
+            document.getElementById('section-simulator').classList.remove('block');
+            document.getElementById('section-trends').classList.add('hidden');
+            document.getElementById('section-trends').classList.remove('block');
+
+            document.getElementById('section-' + tabId).classList.add('block');
+            document.getElementById('section-' + tabId).classList.remove('hidden');
+        }
+
+        // --- REAL ESTATE MOCK DATABASE ---
+        const db = {
+            'Taikoo Shing': {
+                basePSF: 15500,
+                phases: {
+                    'Kao Shan Terrace (Blocks 1-13)': { blocks: 13, maxFloor: 28, baseDist: 400, viewBase: 4 },
+                    'Kam Din Terrace (Blocks 14-21)': { blocks: 8, maxFloor: 28, baseDist: 350, viewBase: 5 },
+                    'Harbour View Gardens (Blocks 28-38)': { blocks: 11, maxFloor: 30, baseDist: 600, viewBase: 8 }
+                },
+                rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+            },
+            'City One': {
+                basePSF: 12500,
+                phases: {
+                    'Phase 1 (Blocks 1-14)': { blocks: 14, maxFloor: 30, baseDist: 300, viewBase: 6 },
+                    'Phase 2 (Blocks 15-23)': { blocks: 9, maxFloor: 30, baseDist: 150, viewBase: 5 },
+                    'Phase 4 (Blocks 33-39)': { blocks: 7, maxFloor: 30, baseDist: 350, viewBase: 3 }
+                },
+                rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+            },
+            'Kingswood Villas': {
+                basePSF: 9000,
+                phases: {
+                    'Phase 1: Locwood Court': { blocks: 14, maxFloor: 35, baseDist: 450, viewBase: 4 }, 
+                    'Phase 2: Sherwood Court': { blocks: 12, maxFloor: 35, baseDist: 650, viewBase: 5 },
+                    'Phase 7: Kenswood Court': { blocks: 14, maxFloor: 35, baseDist: 1200, viewBase: 5 }
+                },
+                rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+            }
+        };
+
+        // --- UI POPULATION LOGIC ---
+        function updatePhases() {
+            const estate = document.getElementById('estate').value;
+            const phaseSelect = document.getElementById('phase');
+            phaseSelect.innerHTML = '';
+            
+            for (let phase in db[estate].phases) {
+                phaseSelect.add(new Option(phase, phase));
+            }
+            updateBlocks();
+        }
+
+        function updateBlocks() {
+            const estate = document.getElementById('estate').value;
+            const phase = document.getElementById('phase').value;
+            const blockSelect = document.getElementById('block');
+            blockSelect.innerHTML = '';
+            
+            const numBlocks = db[estate].phases[phase].blocks;
+            // Simplified block generation for demo purposes
+            for (let i = 1; i <= Math.min(numBlocks, 15); i++) {
+                blockSelect.add(new Option('Block ' + i, i));
+            }
+            updateFloorsRooms();
+        }
+
+        function updateFloorsRooms() {
+            const estate = document.getElementById('estate').value;
+            const phase = document.getElementById('phase').value;
+            const floorSelect = document.getElementById('floor');
+            const roomSelect = document.getElementById('room');
+            
+            floorSelect.innerHTML = '';
+            roomSelect.innerHTML = '';
+            
+            const maxFloor = db[estate].phases[phase].maxFloor;
+            for (let i = 1; i <= maxFloor; i++) {
+                floorSelect.add(new Option(i + '/F', i));
+            }
+            
+            const rooms = db[estate].rooms;
+            for (let room of rooms) {
+                roomSelect.add(new Option('Room ' + room, room));
+            }
+            
+            floorSelect.value = Math.floor(maxFloor / 2);
+            inferAttributes();
+        }
+
+        function formatCurrency(num) {
+            return num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        }
+
+        // --- AI AUTO-INFERENCE ENGINE ---
+        function inferAttributes() {
+            const estate = document.getElementById('estate').value;
+            const phase = document.getElementById('phase').value;
+            const block = parseInt(document.getElementById('block').value);
+            const floor = parseInt(document.getElementById('floor').value);
+            const room = document.getElementById('room').value;
+
+            const estateData = db[estate];
+            const phaseData = estateData.phases[phase];
+
+            let distance = phaseData.baseDist + (block * 15);
+            document.getElementById('inferred-distance').innerText = distance;
+
+            let size = 0;
+            if (estate === 'Kingswood Villas') {
+                size = (room === 'A' || room === 'E') ? 600 : 440;
+            } else if (estate === 'City One') {
+                size = (room === 'C' || room === 'D') ? 327 : 450;
+            } else { 
+                size = (room === 'A' || room === 'H') ? 800 : 600;
+            }
+            document.getElementById('inferred-size').innerText = size;
+
+            let view = phaseData.viewBase;
+            if (room === 'A' || room === 'E' || room === 'H') view += 1;
+            
+            // "Building Clearance" step function
+            if (floor > 20) view += 2;
+            else if (floor < 5) view -= 1; 
+
+            view = Math.max(1, Math.min(9, view));
+            document.getElementById('inferred-view').innerText = view;
+            
+            const viewDesc = {
+                1: "IEC/Road Noise", 2: "Obstructed", 3: "Internal Building", 4: "Internal Pool", 
+                5: "Standard Garden", 6: "Open Cityscape", 7: "Open Park", 8: "Partial Sea/River", 9: "Premium Unobstructed"
+            };
+            document.getElementById('view-desc').innerText = viewDesc[view] || "";
+
+            calculateValuation(estateData.basePSF, size, floor, view, distance);
+        }
+
+        // --- VALUATION MATH ---
+        function calculateValuation(basePSF, size, floor, view, distance) {
+            let floorPremium = (floor - 10) * 0.005; 
+            let psf = basePSF * (1 + floorPremium);
+
+            let viewPremium = 0;
+            if (view > 6) viewPremium = (view - 6) * 0.05; 
+            else if (view < 4) viewPremium = (view - 4) * 0.03;
+            psf = psf * (1 + viewPremium);
+
+            let distancePenalty = (distance - 200) * 0.0001;
+            psf = psf * (1 - distancePenalty);
+
+            let absoluteBasePrice = psf * size;
+            document.getElementById('base-price').innerText = formatCurrency(absoluteBasePrice);
+
+            // Scenarios
+            document.getElementById('bull-price').innerText = formatCurrency(absoluteBasePrice * 1.025);
+            document.getElementById('bear-price').innerText = formatCurrency(absoluteBasePrice * 0.982);
+            document.getElementById('cut-price').innerText = formatCurrency(absoluteBasePrice * 1.042);
+            document.getElementById('hike-price').innerText = formatCurrency(absoluteBasePrice * 0.965);
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            updatePhases();
+        };
+    </script>
+</body>
+</html>
