@@ -29,9 +29,12 @@ jobs:
           pip install pandas numpy scikit-learn matplotlib
 
       # C. Run your Machine Learning Script
+      - name: Create public folder
+        run: mkdir -p public
+        
       - name: Run Random Forest Model
         run: python estate_micro_trends.py
-             mv feature_trends.png public/feature_trends.png
+          #   mv feature_trends.png public/feature_trends.png
              
       # D. Push the new charts back to the website!
       - name: Commit and Push Changes
