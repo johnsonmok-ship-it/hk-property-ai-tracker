@@ -87,8 +87,8 @@ plt.tight_layout()
 
 # --- THE BRUTE-FORCE FOLDER FIX ---
 # Save the file directly to the current directory
-   plt.savefig('feature_trends.png', bbox_inches='tight')
-   print("Successfully saved chart to feature_trends.png")
+plt.savefig('feature_trends.png', bbox_inches='tight')
+print("Successfully saved chart to feature_trends.png")
 
 
 5. **CRITICAL:** Click the green **"Commit changes"** button in the top right corner. (If you don't click this, the agent won't see the new code).
