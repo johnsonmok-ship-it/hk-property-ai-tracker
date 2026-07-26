@@ -90,8 +90,3 @@ plt.tight_layout()
 plt.savefig('feature_trends.png', bbox_inches='tight')
 print("Successfully saved chart to feature_trends.png")
 
-
-5. **CRITICAL:** Click the green **"Commit changes"** button in the top right corner. (If you don't click this, the agent won't see the new code).
-6. Go back to your **Actions** tab and hit **"Run workflow"**.
-
-Because we added the `os.remove('public')` safety check, it is mathematically impossible for the folder error to happen again!
