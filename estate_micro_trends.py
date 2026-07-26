@@ -88,7 +88,7 @@ plt.tight_layout()
 # No more 'public/' folder. It saves right next to the script!
 plt.savefig('feature_trends.png', bbox_inches='tight')
 print("Successfully saved chart to feature_trends.png")
-```eof
+
 
 ### 2. Update `.github/workflows/update_model.yml`
 
