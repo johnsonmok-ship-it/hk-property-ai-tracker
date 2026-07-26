@@ -40,4 +40,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "🤖 AI Agent: Updated Property Feature Trends"
-          file_pattern: '*.png'
+          file_pattern: 'public/*.png'
