@@ -85,8 +85,7 @@ for i, v in enumerate(yearly_psf.values):
 plt.grid(True, linestyle='--', alpha=0.3)
 plt.tight_layout()
 
-# --- THE BRUTE-FORCE FOLDER FIX ---
-# Save the file directly to the current directory
-plt.savefig('feature_trends.png', bbox_inches='tight')
-print("Successfully saved chart to feature_trends.png")
-
+# --- SAVE TO PUBLIC FOLDER ---
+os.makedirs('public', exist_ok=True)
+plt.savefig('public/feature_trends.png', bbox_inches='tight')
+print("Successfully saved chart to public/feature_trends.png")
