@@ -26,7 +26,7 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          pip install pandas numpy scikit-learn matplotlib
+          pip install pandas numpy scikit-learn matplotlib tensorflow
 
       # C. Run your Machine Learning Script
       - name: Run Random Forest Model
