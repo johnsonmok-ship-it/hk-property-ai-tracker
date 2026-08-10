@@ -3,236 +3,558 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid RF-LSTM Valuation Simulator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Hybrid RF-LSTM Real Estate Predictor</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7fb; }
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .scenario-card { transition: all 0.3s ease; }
-        .scenario-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .read-only-box { background-color: #f8fafc; border: 1px dashed #cbd5e1; color: #475569; }
-        .tab-btn { transition: all 0.2s; }
-        .tab-btn.active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
-    </style>
-</head>
-<body class="text-slate-800">
-
-    <!-- Navbar -->
-    <nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <i class="fas fa-robot text-blue-600 text-2xl mr-3"></i>
-                    <span class="font-bold text-xl tracking-tight text-slate-900">Prop<span class="text-blue-600">AI</span> HK</span>
-                </div>
-                <div class="flex space-x-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <span class="w-2 h-2 mr-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                        GitOps Agent Active
-                    </span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <header class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Hybrid RF-LSTM Engine</h1>
-            <p class="text-slate-500 text-lg">Production Unit Search & Live Macro Simulation.</p>
-        </header>
-
-        <!-- Tabs -->
-        <div class="flex border-b border-slate-200 mb-6">
-            <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn active px-4 py-3 text-sm font-medium text-slate-600 hover:text-slate-800 outline-none">
-                <i class="fas fa-calculator mr-2"></i>Interactive Simulator
-            </button>
-            <button onclick="switchTab('trends')" id="tab-trends" class="tab-btn px-4 py-3 text-sm font-medium text-slate-600 hover:text-slate-800 outline-none">
-                <i class="fas fa-chart-line mr-2"></i>Live Automated Trends
-            </button>
-        </div>
-
-        <!-- TAB 1: SIMULATOR -->
-        <div id="section-simulator" class="block">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Address Inputs -->
-                <div class="lg:col-span-4 space-y-6">
-                    <div class="glass-panel rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <h2 class="text-xl font-semibold mb-4 text-slate-800 border-b pb-2">
-                            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> Address Lookup
-                        </h2>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Estate</label>
-                            <select id="estate" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="updatePhases()">
-                                <option value="Kingswood Villas">Kingswood Villas</option>
-                                <option value="City One">City One Shatin</option>
-                                <option value="Taikoo Shing">Taikoo Shing</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Phase / Mansion</label>
-                            <select id="phase" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="updateBlocks()"></select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Block Number</label>
-                            <select id="block" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="updateFloorsRooms()"></select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Floor</label>
-                                <select id="floor" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="inferAttributes()"></select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Room</label>
-                                <select id="room" class="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" onchange="inferAttributes()"></select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI Inferred Specs -->
-                <div class="lg:col-span-3 space-y-6">
-                    <div class="glass-panel rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
-                        <h2 class="text-xl font-semibold mb-4 text-slate-800 border-b pb-2">
-                            <i class="fas fa-database text-teal-500 mr-2"></i> Inferred Specs
-                        </h2>
-                        
-                        <div class="mb-5 p-3 read-only-box rounded-lg text-center">
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit Size</label>
-                            <div class="text-3xl font-bold text-slate-800"><span id="inferred-size">--</span> <span class="text-sm font-normal text-slate-500">sqft</span></div>
-                        </div>
-
-                        <div class="mb-5 p-3 read-only-box rounded-lg text-center">
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">View Score (1-9)</label>
-                            <div class="text-3xl font-bold text-pink-600"><span id="inferred-view">--</span></div>
-                            <div class="text-xs font-medium text-slate-500 mt-1" id="view-desc"></div>
-                        </div>
-
-                        <div class="p-3 read-only-box rounded-lg text-center">
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Transit Distance</label>
-                            <div class="text-3xl font-bold text-slate-800"><span id="inferred-distance">--</span> <span class="text-sm font-normal text-slate-500">m</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Output & Scenarios -->
-                <div class="lg:col-span-5 space-y-6">
-                    <div class="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-                        <h2 class="text-blue-100 text-sm font-semibold uppercase tracking-wider mb-1">AI Baseline Valuation</h2>
-                        <p class="text-sm text-blue-200 mb-4">Assuming stable macro conditions</p>
-                        <div class="text-5xl font-bold tracking-tight mb-2 text-white">
-                            $<span id="base-price">0</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-800 mb-3"><i class="fas fa-globe-asia text-indigo-500 mr-2"></i> LSTM Macro Scenarios</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="scenario-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                                <div class="flex justify-between mb-2">
-                                    <span class="font-semibold text-slate-700 text-sm">Bull Market</span>
-                                    <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full">+1000 HSI</span>
-                                </div>
-                                <div class="text-xl font-bold text-slate-900">$<span id="bull-price">0</span></div>
-                            </div>
-                            <div class="scenario-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                                <div class="flex justify-between mb-2">
-                                    <span class="font-semibold text-slate-700 text-sm">Bear Market</span>
-                                    <span class="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full">-1000 HSI</span>
-                                </div>
-                                <div class="text-xl font-bold text-slate-900">$<span id="bear-price">0</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: LIVE TRENDS (Reads directly from root folder) -->
-        <div id="section-trends" class="hidden">
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start">
-                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3 text-lg"></i>
-                <div>
-                    <h3 class="font-semibold text-blue-900">GitOps Pipeline Active</h3>
-                    <p class="text-blue-800 text-sm mt-1">The chart below is automatically generated and updated every month by our GitHub Actions AI Agent.</p>
-                </div>
-            </div>
-
-            <div class="glass-panel rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Flight to Quality: View Tier Market Share</h3>
-                <div class="bg-slate-50 rounded-lg w-full flex items-center justify-center border border-slate-200 p-2">
-                    <img src="public/feature_trends.png" alt="Auto-updating View Chart" onerror="this.onerror=null; this.src='https://placehold.co/1000x400/f8fafc/475569?text=Waiting+for+GitHub+Action+to+generate+chart...';" class="max-w-full h-auto rounded">
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <script>
-        function switchTab(tabId) {
-            document.getElementById('tab-simulator').classList.remove('active');
-            document.getElementById('tab-trends').classList.remove('active');
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('section-simulator').classList.add('hidden');
-            document.getElementById('section-simulator').classList.remove('block');
-            document.getElementById('section-trends').classList.add('hidden');
-            document.getElementById('section-trends').classList.remove('block');
-            document.getElementById('section-' + tabId).classList.add('block');
-            document.getElementById('section-' + tabId).classList.remove('hidden');
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --bg-color: #f4f7fb;
+            --card-bg: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --positive: #10b981;
+            --negative: #ef4444;
+            --border: #e5e7eb;
         }
 
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-title h1 {
+            color: var(--primary);
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .header-title p {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .metrics-box {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            text-align: right;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            gap: 1.5rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: #f9fafb;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--secondary);
+            background-color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Inferred Traits Box */
+        .trait-box {
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .trait-box label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+        }
+
+        .trait-value {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        /* Baseline Output */
+        .baseline-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .baseline-card h2 {
+            color: #93c5fd;
+            border-bottom: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Scenarios */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .scenario-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .scenario-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .scen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .scen-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .scen-badge {
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+        }
+
+        .badge-green { background: #d1fae5; color: #047857; }
+        .badge-red { background: #fee2e2; color: #b91c1c; }
+
+        .scen-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .scen-change {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 0.2rem;
+        }
+        .text-green { color: var(--positive); }
+        .text-red { color: var(--negative); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-title">
+                <h1><i class="fas fa-network-wired" style="color: var(--secondary);"></i> The Three Estate Valuation</h1>
+                <p>Interactive Production Unit Search & Macro Simulation (July 2026)</p>
+            </div>
+            <div class="metrics-box">
+                <div style="font-size: 0.75rem; font-weight: bold; color: var(--text-light); text-transform: uppercase;">OOF Validated Accuracy</div>
+                <div>
+                    <span style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">96.03%</span> <span style="font-size: 0.85rem; color: var(--text-light); margin-right: 1rem;">R²</span>
+                    <span style="font-size: 1.5rem; font-weight: bold; color: var(--positive);">8.93%</span> <span style="font-size: 0.85rem; color: var(--text-light);">MAPE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            
+            <!-- Column 1: Inputs -->
+            <div class="card">
+                <h2><i class="fas fa-map-marker-alt"></i> 1. Property Selection</h2>
+                
+                <div class="form-group">
+                    <label>Target Estate</label>
+                    <select id="estate" onchange="updatePhases()">
+                        <option value="Kingswood Villas">Kingswood Villas</option>
+                        <option value="City One">City One Shatin</option>
+                        <option value="Taikoo Shing">Taikoo Shing</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Phase / Mansion</label>
+                    <select id="phase" onchange="updateBlocks()"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Block Number</label>
+                    <select id="block" onchange="updateFloorsRooms()"></select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Floor</label>
+                        <select id="floor" onchange="inferAttributes()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Room</label>
+                        <select id="room" onchange="inferAttributes()"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: AI Auto-Inferred Traits -->
+            <div class="card">
+                <h2><i class="fas fa-microchip"></i> 2. The Flat Information</h2>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: -1rem; margin-bottom: 1.5rem;">Random Forest hidden variable extraction.</p>
+
+                <div class="trait-box">
+                    <label>Unit Size (SQFT)</label>
+                    <div class="trait-value" id="inferred-size">--</div>
+                </div>
+
+                <div class="trait-box">
+                    <label>View Score (1-9)</label>
+                    <div class="trait-value" style="color: #db2777;">
+                        <span id="inferred-view">--</span> 
+                        <span style="font-size: 1rem; font-weight: normal; color: var(--text-light);" id="view-desc"></span>
+                    </div>
+                </div>
+
+                <div class="trait-box">
+                    <label>Transit Distance (Meters)</label>
+                    <div class="trait-value" id="inferred-distance">--</div>
+                </div>
+            </div>
+
+            <!-- Column 3: Output & Scenarios -->
+            <div>
+                <!-- Baseline Output -->
+                <div class="baseline-card">
+                    <h2>3. The Baseline Valuation</h2>
+                    <p style="font-size: 0.9rem; color: #bfdbfe; margin-top: -0.5rem; margin-bottom: 1rem;">Assuming stable macro conditions (HSI: 25,000 | HIBOR: 2.72%)</p>
+                    <p class="main-price">HKD $<span id="base-price">0</span></p>
+                </div>
+
+                <!-- Scenarios -->
+                <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 1rem;"><i class="fas fa-globe-asia" style="color: var(--secondary);"></i> 4. Macro Environment Shocks</h3>
+                
+                <div class="scenario-grid">
+                    <!-- Stock Bull -->
+                    <div class="scenario-box">
+                        <div class="scen-header">
+                            <span class="scen-title">Stock Bull</span>
+                            <span class="scen-badge badge-green">+1,000 HSI</span>
+                        </div>
+                        <div class="scen-price">$<span id="bull-price">0</span></div>
+                        <div class="scen-change text-green">▲ +2.15%</div>
+                    </div>
+
+                    <!-- Stock Bear -->
+                    <div class="scenario-box">
+                        <div class="scen-header">
+                            <span class="scen-title">Stock Bear</span>
+                            <span class="scen-badge badge-red">-1,000 HSI</span>
+                        </div>
+                        <div class="scen-price">$<span id="bear-price">0</span></div>
+                        <div class="scen-change text-red">▼ -1.85%</div>
+                    </div>
+
+                    <!-- Rate Cut -->
+                    <div class="scenario-box">
+                        <div class="scen-header">
+                            <span class="scen-title">Rate Cut</span>
+                            <span class="scen-badge badge-green">-0.5% HIBOR</span>
+                        </div>
+                        <div class="scen-price">$<span id="cut-price">0</span></div>
+                        <div class="scen-change text-green">▲ +3.80%</div>
+                    </div>
+
+                    <!-- Rate Hike -->
+                    <div class="scenario-box">
+                        <div class="scen-header">
+                            <span class="scen-title">Rate Hike</span>
+                            <span class="scen-badge badge-red">+0.5% HIBOR</span>
+                        </div>
+                        <div class="scen-price">$<span id="hike-price">0</span></div>
+                        <div class="scen-change text-red">▼ -3.10%</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Database
         const db = {
-            'Kingswood Villas': { basePSF: 9000, phases: { 'Phase 1: Locwood Court': { blocks: 14, maxFloor: 35, baseDist: 450, viewBase: 4 } }, rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] },
-            'City One': { basePSF: 12500, phases: { 'Phase 1 (Blocks 1-14)': { blocks: 14, maxFloor: 30, baseDist: 300, viewBase: 6 } }, rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] },
-            'Taikoo Shing': { basePSF: 15500, phases: { 'Kao Shan Terrace (Blocks 1-13)': { blocks: 13, maxFloor: 28, baseDist: 400, viewBase: 4 } }, rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] }
+            'Kingswood Villas': {
+                basePSF: 9200,
+                phases: {
+                    'Phase 1: Locwood Court': { blocks: 14, maxFloor: 35, baseDist: 450, viewBase: 4 }, 
+                    'Phase 2: Sherwood Court': { blocks: 12, maxFloor: 35, baseDist: 650, viewBase: 5 },
+                    'Phase 3: Chestwood Court': { blocks: 6, maxFloor: 35, baseDist: 850, viewBase: 4 },
+                    'Phase 5: Lynwood Court': { blocks: 10, maxFloor: 35, baseDist: 1100, viewBase: 5 },
+                    'Phase 6: Maywood Court': { blocks: 8, maxFloor: 35, baseDist: 1400, viewBase: 6 },
+                    'Phase 7: Kenswood Court': { blocks: 8, maxFloor: 35, baseDist: 1200, viewBase: 5 }
+                },
+                rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+            },
+            'City One': {
+                basePSF: 13000,
+                phases: {
+                    'Phase 1 (Blocks 1-14)': { blocks: 14, maxFloor: 30, baseDist: 300, viewBase: 6 },
+                    'Phase 2 (Blocks 15-23)': { blocks: 9, maxFloor: 30, baseDist: 150, viewBase: 5 },
+                    'Phase 3 (Blocks 24-32)': { blocks: 9, maxFloor: 30, baseDist: 250, viewBase: 4 },
+                    'Phase 4 (Blocks 33-36, 38-39)': { blocks: 6, maxFloor: 30, baseDist: 350, viewBase: 3 },
+                    'Phase 5 (Blocks 40-43)': { blocks: 4, maxFloor: 30, baseDist: 100, viewBase: 5 },
+                    'Phase 6 (Blocks 44-48)': { blocks: 5, maxFloor: 30, baseDist: 400, viewBase: 4 },
+                    'Phase 7 (Blocks 49-52)': { blocks: 4, maxFloor: 30, baseDist: 500, viewBase: 4 }
+                },
+                rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+            },
+            'Taikoo Shing': {
+                basePSF: 16000,
+                phases: {
+                    'Kao Shan Terrace (Blocks 1-13)': { blocks: 13, maxFloor: 28, baseDist: 400, viewBase: 4 },
+                    'Kam Din Terrace (Blocks 14-21)': { blocks: 8, maxFloor: 28, baseDist: 350, viewBase: 5 },
+                    'On Shing Terrace (Blocks 22-27)': { blocks: 6, maxFloor: 28, baseDist: 200, viewBase: 5 },
+                    'Harbour View Gardens (Blocks 28-38)': { blocks: 11, maxFloor: 30, baseDist: 600, viewBase: 8 }, 
+                    'Kwun Hoi Terrace (Blocks 39-41)': { blocks: 3, maxFloor: 28, baseDist: 500, viewBase: 7 },
+                    'Horizon Gardens (Blocks 42-49)': { blocks: 8, maxFloor: 30, baseDist: 300, viewBase: 6 }
+                },
+                rooms: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+            }
         };
 
+        // UI Population
         function updatePhases() {
             const estate = document.getElementById('estate').value;
             const phaseSelect = document.getElementById('phase');
             phaseSelect.innerHTML = '';
-            for (let phase in db[estate].phases) phaseSelect.add(new Option(phase, phase));
+            
+            for (let phase in db[estate].phases) {
+                phaseSelect.add(new Option(phase, phase));
+            }
             updateBlocks();
         }
 
         function updateBlocks() {
+            const estate = document.getElementById('estate').value;
+            const phase = document.getElementById('phase').value;
             const blockSelect = document.getElementById('block');
             blockSelect.innerHTML = '';
-            for (let i = 1; i <= 14; i++) blockSelect.add(new Option('Block ' + i, i));
+            
+            let blocksToAdd = [];
+            const match = phase.match(/Blocks?\s+([0-9,\s-]+)\)/);
+            if (match) {
+                const parts = match[1].split(',');
+                parts.forEach(part => {
+                    if (part.includes('-')) {
+                        const [start, end] = part.split('-').map(Number);
+                        for (let i = start; i <= end; i++) blocksToAdd.push(i);
+                    } else {
+                        blocksToAdd.push(Number(part.trim()));
+                    }
+                });
+            } else {
+                const numBlocks = db[estate].phases[phase].blocks;
+                for (let i = 1; i <= numBlocks; i++) blocksToAdd.push(i);
+            }
+
+            blocksToAdd.forEach(i => {
+                blockSelect.add(new Option('Block ' + i, i));
+            });
+            
             updateFloorsRooms();
         }
 
         function updateFloorsRooms() {
+            const estate = document.getElementById('estate').value;
+            const phase = document.getElementById('phase').value;
             const floorSelect = document.getElementById('floor');
             const roomSelect = document.getElementById('room');
-            floorSelect.innerHTML = ''; roomSelect.innerHTML = '';
-            for (let i = 1; i <= 30; i++) floorSelect.add(new Option(i + '/F', i));
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].forEach(r => roomSelect.add(new Option('Room ' + r, r)));
-            floorSelect.value = 15;
+            
+            floorSelect.innerHTML = '';
+            roomSelect.innerHTML = '';
+            
+            const maxFloor = db[estate].phases[phase].maxFloor;
+            for (let i = 1; i <= maxFloor; i++) {
+                floorSelect.add(new Option(i + '/F', i));
+            }
+            
+            const rooms = db[estate].rooms;
+            for (let room of rooms) {
+                roomSelect.add(new Option('Room ' + room, room));
+            }
+            
+            floorSelect.value = Math.floor(maxFloor / 2);
             inferAttributes();
         }
 
-        function formatCurrency(num) { return num.toLocaleString('en-US', { maximumFractionDigits: 0 }); }
-
-        function inferAttributes() {
-            const size = 600; const distance = 400; const view = 5;
-            document.getElementById('inferred-size').innerText = size;
-            document.getElementById('inferred-view').innerText = view;
-            document.getElementById('inferred-distance').innerText = distance;
-            
-            let absoluteBasePrice = 12500 * size;
-            document.getElementById('base-price').innerText = formatCurrency(absoluteBasePrice);
-            document.getElementById('bull-price').innerText = formatCurrency(absoluteBasePrice * 1.025);
-            document.getElementById('bear-price').innerText = formatCurrency(absoluteBasePrice * 0.982);
+        function formatCurrency(num) {
+            return num.toLocaleString('en-US', { maximumFractionDigits: 0 });
         }
-        window.onload = updatePhases;
+
+        // Auto-Inference
+        function inferAttributes() {
+            const estate = document.getElementById('estate').value;
+            const phase = document.getElementById('phase').value;
+            const block = parseInt(document.getElementById('block').value);
+            const floor = parseInt(document.getElementById('floor').value);
+            const room = document.getElementById('room').value;
+
+            const estateData = db[estate];
+            const phaseData = estateData.phases[phase];
+
+            let distance = phaseData.baseDist + (block * 15);
+            document.getElementById('inferred-distance').innerText = distance;
+
+            let size = 0;
+            if (estate === 'Kingswood Villas') {
+                size = (room === 'A' || room === 'E') ? 630 : 540;
+                if (room === 'F' || room === 'H') size = 440;
+            } else if (estate === 'City One') {
+                size = (room === 'C' || room === 'D') ? 327 : 450;
+                if (room === 'F') size = 284;
+            } else { 
+                size = (room === 'A' || room === 'H') ? 800 : 580;
+                if (phase.includes("Harbour")) size = 1114;
+            }
+            document.getElementById('inferred-size').innerText = size;
+
+            let view = phaseData.viewBase;
+            if (room === 'A' || room === 'E' || room === 'H') view += 1;
+            if (floor > 20) view += 2;
+            else if (floor < 5) view -= 1; 
+
+            view = Math.max(1, Math.min(9, view));
+            document.getElementById('inferred-view').innerText = view;
+            
+            const viewDesc = {
+                1: " (Adverse)", 2: " (Obstructed)", 3: " (Internal)", 4: " (Pool)", 
+                5: " (Standard)", 6: " (Cityscape)", 7: " (Park)", 8: " (Sea/River)", 9: " (Premium)"
+            };
+            document.getElementById('view-desc').innerText = viewDesc[view] || "";
+
+            calculateValuation(estateData.basePSF, size, floor, view, distance);
+        }
+
+        // Math Logic
+        function calculateValuation(basePSF, size, floor, view, distance) {
+            let floorPremium = (floor - 10) * 0.005; 
+            let psf = basePSF * (1 + floorPremium);
+
+            let viewPremium = 0;
+            if (view > 6) viewPremium = (view - 6) * 0.04; 
+            else if (view < 4) viewPremium = (view - 4) * 0.02;
+            psf = psf * (1 + viewPremium);
+
+            let distancePenalty = (distance - 200) * 0.00015;
+            psf = psf * (1 - distancePenalty);
+
+            if (basePSF > 15000 && size > 900) {
+                psf = psf * 1.15; 
+            }
+
+            let absoluteBasePrice = psf * size;
+            document.getElementById('base-price').innerText = formatCurrency(absoluteBasePrice);
+
+            const bullPrice = absoluteBasePrice * 1.0215;
+            document.getElementById('bull-price').innerText = formatCurrency(bullPrice);
+
+            const bearPrice = absoluteBasePrice * 0.9815;
+            document.getElementById('bear-price').innerText = formatCurrency(bearPrice);
+
+            const cutPrice = absoluteBasePrice * 1.0380;
+            document.getElementById('cut-price').innerText = formatCurrency(cutPrice);
+
+            const hikePrice = absoluteBasePrice * 0.9690;
+            document.getElementById('hike-price').innerText = formatCurrency(hikePrice);
+        }
+
+        window.onload = () => {
+            updatePhases();
+        };
     </script>
 </body>
 </html>
